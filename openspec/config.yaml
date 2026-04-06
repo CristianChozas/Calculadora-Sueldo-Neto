@@ -1,0 +1,21 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Next.js 16, React 19, TypeScript 5, Tailwind CSS 4
+  Architecture: Modular monolith with Clean Architecture boundaries
+  Testing: To be added in upcoming tickets
+  Style: ESLint via eslint-config-next
+
+rules:
+  proposal:
+    - Include affected modules and rollback notes for risky changes
+  specs:
+    - Use Given/When/Then scenarios and clear acceptance criteria
+  tasks:
+    - Keep tasks small and aligned to one roadmap ticket
+  apply:
+    - Keep fiscal rules isolated from UI and framework details
+  verify:
+    - Run lint, build, and tests when available before closing a ticket
+  archive:
+    - Archive only after implementation and verification are complete
