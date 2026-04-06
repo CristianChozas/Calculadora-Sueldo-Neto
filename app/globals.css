@@ -1,26 +1,88 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f7fb;
+  --foreground: #162033;
+  --surface: #ffffff;
+  --surface-muted: #eef3f9;
+  --border: #d7e0ec;
+  --primary: #0f2747;
+  --primary-strong: #09182f;
+  --accent: #1f7a8c;
+  --accent-soft: #d9f0f2;
+  --muted: #5b6475;
+  --success: #1d6f5f;
+  --warning: #9a6a12;
+  --danger: #b53a3a;
+  --shadow-soft: 0 24px 60px rgba(15, 39, 71, 0.12);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-muted: var(--muted);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --radius-card: 1.5rem;
+  --radius-pill: 999px;
+  --shadow-soft: var(--shadow-soft);
+  --spacing-18: 4.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #08111f;
+    --foreground: #edf3fb;
+    --surface: #0e1a2c;
+    --surface-muted: #12233a;
+    --border: #213551;
+    --primary: #c6d8ff;
+    --primary-strong: #edf3ff;
+    --accent: #6dd0d5;
+    --accent-soft: rgba(109, 208, 213, 0.14);
+    --muted: #9babc3;
+    --success: #68d1ba;
+    --warning: #f0c15d;
+    --danger: #ff8f8f;
+    --shadow-soft: 0 24px 60px rgba(0, 0, 0, 0.38);
+  }
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--primary-strong);
 }
