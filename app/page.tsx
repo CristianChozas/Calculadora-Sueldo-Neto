@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CurrencyInput } from "@/components/CurrencyInput";
+import { ResultCard } from "@/components/ResultCard";
 import {
   AUTONOMOUS_COMMUNITIES,
   CONTRACT_TYPES,
@@ -152,6 +153,12 @@ export default function Home() {
       : grossAnnualSalary / paymentsPerYear;
   const unemploymentRate =
     SOCIAL_SECURITY_RATES_2025.unemploymentByContract[contractType] * 100;
+  const highlightedAnnualNetSalary = calculationResult
+    ? currencyFormatter.format(calculationResult.netAnnualSalary)
+    : "Pendiente";
+  const highlightedMonthlyNetSalary = calculationResult
+    ? currencyFormatter.format(calculationResult.netMonthlySalary)
+    : "Pendiente";
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-18">
@@ -159,16 +166,23 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)] lg:items-start">
           <div>
             <span className="inline-flex rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium tracking-[0.18em] text-accent uppercase">
-              CSN-013
+              CSN-015
             </span>
             <div className="mt-8 max-w-3xl space-y-6">
               <h1 className="text-4xl font-semibold tracking-tight text-primary-strong sm:text-6xl">
                 Calculadora de sueldo neto con base fiscal 2025.
               </h1>
               <p className="max-w-2xl text-base leading-8 text-muted sm:text-lg">
-                El resultado ya se actualiza al instante a medida que cambian los
-                datos del formulario, sin boton manual de calcular.
+                El neto anual y mensual ya se presenta como el dato principal de la
+                pantalla para que la lectura sea inmediata.
               </p>
+            </div>
+            <div className="mt-10">
+              <ResultCard
+                annualNetSalary={highlightedAnnualNetSalary}
+                monthlyNetSalary={highlightedMonthlyNetSalary}
+                isPending={!calculationResult}
+              />
             </div>
             <div className="mt-10 grid gap-4 sm:grid-cols-5">
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
@@ -210,7 +224,7 @@ export default function Home() {
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Estado</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
-                  Listo para CSN-015
+                  Listo para CSN-016
                 </p>
               </article>
             </div>
@@ -313,20 +327,6 @@ export default function Home() {
               </p>
               {calculationResult ? (
                 <div className="mt-4 space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <article>
-                      <p className="text-sm font-medium text-muted">Neto anual</p>
-                      <p className="mt-1 text-2xl font-semibold text-primary-strong">
-                        {currencyFormatter.format(calculationResult.netAnnualSalary)}
-                      </p>
-                    </article>
-                    <article>
-                      <p className="text-sm font-medium text-muted">Neto mensual</p>
-                      <p className="mt-1 text-2xl font-semibold text-primary-strong">
-                        {currencyFormatter.format(calculationResult.netMonthlySalary)}
-                      </p>
-                    </article>
-                  </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <article>
                       <p className="text-sm font-medium text-muted">IRPF estimado</p>
