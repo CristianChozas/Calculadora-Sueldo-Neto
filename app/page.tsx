@@ -18,6 +18,7 @@ import {
   SOCIAL_SECURITY_RATES_2025,
   calculateEmployeeSocialSecurity,
 } from "@/lib/seguridadSocial";
+import { calculateNetSalary } from "@/lib/calculadora";
 
 const MIN_SALARY = 0;
 const MAX_SALARY = 999999;
@@ -98,6 +99,18 @@ function getDependantsError(rawValue: string) {
   return undefined;
 }
 
+function getAgeError(rawValue: string) {
+  if (!rawValue.trim()) {
+    return "La edad es obligatoria.";
+  }
+
+  if (!/^\d+$/.test(rawValue.trim())) {
+    return "Introduce una edad valida en anos cumplidos.";
+  }
+
+  return undefined;
+}
+
 export default function Home() {
   const [grossAnnualSalary, setGrossAnnualSalary] = useState<number | null>(null);
   const [grossAnnualSalaryRaw, setGrossAnnualSalaryRaw] = useState("");
@@ -106,11 +119,28 @@ export default function Home() {
   const [autonomousCommunity, setAutonomousCommunity] =
     useState<AutonomousCommunity>("madrid");
   const [maritalStatus, setMaritalStatus] = useState<MaritalStatus>("soltero");
+  const [ageRaw, setAgeRaw] = useState("30");
   const [dependantsRaw, setDependantsRaw] = useState("0");
   const [disability, setDisability] = useState<DisabilityLevel>("none");
   const grossAnnualSalaryError = getGrossSalaryError(grossAnnualSalaryRaw, grossAnnualSalary);
+  const ageError = getAgeError(ageRaw);
   const dependantsError = getDependantsError(dependantsRaw);
+  const age = ageError ? 0 : Number(ageRaw);
   const dependants = dependantsError ? 0 : Number(dependantsRaw);
+  const hasFormErrors = Boolean(grossAnnualSalaryError || ageError || dependantsError);
+  const calculationResult =
+    !hasFormErrors && grossAnnualSalary !== null
+      ? calculateNetSalary({
+          grossAnnualSalary,
+          contractType,
+          paymentsPerYear,
+          autonomousCommunity,
+          maritalStatus,
+          dependants,
+          age,
+          disability,
+        })
+      : null;
   const socialSecurity = calculateEmployeeSocialSecurity(
     grossAnnualSalaryError ? 0 : grossAnnualSalary ?? 0,
     contractType,
@@ -136,8 +166,8 @@ export default function Home() {
                 Calculadora de sueldo neto con base fiscal 2025.
               </h1>
               <p className="max-w-2xl text-base leading-8 text-muted sm:text-lg">
-                La capa de entrada ya valida campos obligatorios, rango y formato
-                numerico para preparar el calculo en tiempo real del siguiente ticket.
+                El resultado ya se actualiza al instante a medida que cambian los
+                datos del formulario, sin boton manual de calcular.
               </p>
             </div>
             <div className="mt-10 grid gap-4 sm:grid-cols-5">
@@ -172,9 +202,15 @@ export default function Home() {
                 </p>
               </article>
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
+                <p className="text-sm font-medium text-muted">Edad</p>
+                <p className="mt-2 text-lg font-semibold text-primary">
+                  {ageError ? "Pendiente" : `${age} anos`}
+                </p>
+              </article>
+              <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Estado</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
-                  Listo para CSN-014
+                  Listo para CSN-015
                 </p>
               </article>
             </div>
@@ -273,25 +309,77 @@ export default function Home() {
 
             <div className="mt-8 rounded-[var(--radius-card)] border border-border bg-surface p-5">
               <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
-                Impacto actual
+                Resultado en tiempo real
               </p>
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <article>
-                  <p className="text-sm font-medium text-muted">Sueldo bruto mensual</p>
-                  <p className="mt-1 text-2xl font-semibold text-primary-strong">
-                    {grossMonthlySalary === null
-                      ? "Pendiente"
-                      : currencyFormatter.format(grossMonthlySalary)}
+              {calculationResult ? (
+                <div className="mt-4 space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <article>
+                      <p className="text-sm font-medium text-muted">Neto anual</p>
+                      <p className="mt-1 text-2xl font-semibold text-primary-strong">
+                        {currencyFormatter.format(calculationResult.netAnnualSalary)}
+                      </p>
+                    </article>
+                    <article>
+                      <p className="text-sm font-medium text-muted">Neto mensual</p>
+                      <p className="mt-1 text-2xl font-semibold text-primary-strong">
+                        {currencyFormatter.format(calculationResult.netMonthlySalary)}
+                      </p>
+                    </article>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <article>
+                      <p className="text-sm font-medium text-muted">IRPF estimado</p>
+                      <p className="mt-1 text-lg font-semibold text-primary-strong">
+                        {currencyFormatter.format(calculationResult.irpf.totalTaxQuota)}
+                      </p>
+                      <p className="text-sm text-muted">
+                        Tipo efectivo: {calculationResult.irpf.effectiveRate.toFixed(2)}%
+                      </p>
+                    </article>
+                    <article>
+                      <p className="text-sm font-medium text-muted">Seguridad Social</p>
+                      <p className="mt-1 text-lg font-semibold text-primary-strong">
+                        {currencyFormatter.format(
+                          calculationResult.socialSecurity.totalEmployeeContributions,
+                        )}
+                      </p>
+                      <p className="text-sm text-muted">
+                        Desempleo incluido: {currencyFormatter.format(
+                          calculationResult.socialSecurity.unemployment,
+                        )}
+                      </p>
+                    </article>
+                  </div>
+                  <p className="text-sm leading-6 text-muted">
+                    Base mensual bruta: {currencyFormatter.format(calculationResult.grossMonthlySalary)}. Tipo de paro aplicado: {unemploymentRate.toFixed(2)}%.
                   </p>
-                </article>
-                <article>
-                  <p className="text-sm font-medium text-muted">Desempleo trabajador</p>
-                  <p className="mt-1 text-2xl font-semibold text-primary-strong">
-                    {currencyFormatter.format(socialSecurity.unemployment)}
+                </div>
+              ) : (
+                <div className="mt-4 space-y-3">
+                  <p className="text-sm leading-6 text-muted">
+                    Completa los campos obligatorios con valores validos para ver la
+                    estimacion reactiva del sueldo neto.
                   </p>
-                  <p className="text-sm text-muted">Tipo aplicado: {unemploymentRate.toFixed(2)}%</p>
-                </article>
-              </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <article>
+                      <p className="text-sm font-medium text-muted">Sueldo bruto mensual</p>
+                      <p className="mt-1 text-2xl font-semibold text-primary-strong">
+                        {grossMonthlySalary === null
+                          ? "Pendiente"
+                          : currencyFormatter.format(grossMonthlySalary)}
+                      </p>
+                    </article>
+                    <article>
+                      <p className="text-sm font-medium text-muted">Desempleo trabajador</p>
+                      <p className="mt-1 text-2xl font-semibold text-primary-strong">
+                        {currencyFormatter.format(socialSecurity.unemployment)}
+                      </p>
+                      <p className="text-sm text-muted">Tipo aplicado: {unemploymentRate.toFixed(2)}%</p>
+                    </article>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="mt-8 space-y-3">
@@ -319,6 +407,36 @@ export default function Home() {
                 El IRPF autonomico puede variar segun la comunidad. Por ahora, la
                 calculadora usa la referencia estatal como estimacion orientativa.
               </p>
+            </div>
+
+            <div className="mt-8 space-y-3">
+              <label
+                htmlFor="age"
+                className="block text-sm font-medium text-primary-strong"
+              >
+                Edad
+              </label>
+              <input
+                id="age"
+                type="text"
+                inputMode="numeric"
+                value={ageRaw}
+                aria-invalid={Boolean(ageError)}
+                aria-describedby={ageError ? "age-error" : undefined}
+                onChange={(event) => {
+                  setAgeRaw(event.target.value);
+                }}
+                className="w-full rounded-[var(--radius-card)] border bg-surface px-4 py-3 text-base font-medium text-primary shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+              />
+              {ageError ? (
+                <p id="age-error" className="text-sm font-medium text-danger">
+                  {ageError}
+                </p>
+              ) : (
+                <p className="text-sm leading-6 text-muted">
+                  La edad ajusta el minimo personal en el motor fiscal actual.
+                </p>
+              )}
             </div>
 
             <div className="mt-8 space-y-3">
@@ -418,6 +536,12 @@ export default function Home() {
                   <p className="text-sm font-medium text-muted">Estado civil</p>
                   <p className="mt-1 text-lg font-semibold text-primary-strong">
                     {maritalStatusLabels[maritalStatus]}
+                  </p>
+                </article>
+                <article>
+                  <p className="text-sm font-medium text-muted">Edad</p>
+                  <p className="mt-1 text-lg font-semibold text-primary-strong">
+                    {ageError ? "Pendiente" : `${age} anos`}
                   </p>
                 </article>
                 <article>
