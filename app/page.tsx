@@ -191,15 +191,15 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)] lg:items-start">
           <div>
             <span className="inline-flex rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium tracking-[0.18em] text-accent uppercase">
-              CSN-017
+              CSN-018
             </span>
             <div className="mt-8 max-w-3xl space-y-6">
               <h1 className="text-4xl font-semibold tracking-tight text-primary-strong sm:text-6xl">
                 Calculadora de sueldo neto con base fiscal 2025.
               </h1>
               <p className="max-w-2xl text-base leading-8 text-muted sm:text-lg">
-                El panel de resultados ya visualiza la distribucion entre neto,
-                IRPF y Seguridad Social con un grafico integrado.
+                La pantalla ya incorpora una referencia oficial y un aviso legal para
+                contextualizar la estimacion mostrada.
               </p>
             </div>
             <div className="mt-10">
@@ -249,7 +249,7 @@ export default function Home() {
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Estado</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
-                  Listo para CSN-018
+                  Listo para CSN-019
                 </p>
               </article>
             </div>
@@ -454,6 +454,25 @@ export default function Home() {
                 total={calculationResult?.grossAnnualSalary ?? 0}
                 pending={!calculationResult}
               />
+            </div>
+
+            <div className="mt-8 rounded-[var(--radius-card)] border border-border bg-surface p-5">
+              <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
+                Transparencia fiscal
+              </p>
+              <div className="mt-4 space-y-4">
+                <a
+                  href="https://sede.agenciatributaria.gob.es"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent/18"
+                >
+                  Como se calcula el IRPF?
+                </a>
+                <p className="rounded-[var(--radius-card)] border border-border bg-surface-muted px-4 py-4 text-sm leading-6 text-muted">
+                  Calculo orientativo. Consulta a un asesor fiscal para casos especificos.
+                </p>
+              </div>
             </div>
 
             <div className="mt-8 space-y-3">
