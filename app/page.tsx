@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import {
+  AUTONOMOUS_COMMUNITIES,
   CONTRACT_TYPES,
   PAY_PERIOD_OPTIONS,
+  type AutonomousCommunity,
   type ContractType,
   type PayPeriods,
 } from "@/lib/types";
@@ -27,6 +29,28 @@ const contractLabels: Record<ContractType, string> = {
   temporal: "Temporal",
 };
 
+const autonomousCommunityLabels: Record<AutonomousCommunity, string> = {
+  andalucia: "Andalucia",
+  aragon: "Aragon",
+  asturias: "Asturias",
+  baleares: "Illes Balears",
+  canarias: "Canarias",
+  cantabria: "Cantabria",
+  castilla_la_mancha: "Castilla-La Mancha",
+  castilla_y_leon: "Castilla y Leon",
+  cataluna: "Cataluna",
+  ceuta: "Ceuta",
+  comunidad_valenciana: "Comunitat Valenciana",
+  extremadura: "Extremadura",
+  galicia: "Galicia",
+  la_rioja: "La Rioja",
+  madrid: "Comunidad de Madrid",
+  melilla: "Melilla",
+  murcia: "Region de Murcia",
+  navarra: "Navarra",
+  pais_vasco: "Pais Vasco",
+};
+
 function getGrossSalaryError(value: number | null) {
   if (value === null) {
     return undefined;
@@ -47,6 +71,8 @@ export default function Home() {
   const [grossAnnualSalary, setGrossAnnualSalary] = useState<number | null>(null);
   const [contractType, setContractType] = useState<ContractType>("indefinido");
   const [paymentsPerYear, setPaymentsPerYear] = useState<PayPeriods>(12);
+  const [autonomousCommunity, setAutonomousCommunity] =
+    useState<AutonomousCommunity>("madrid");
   const grossAnnualSalaryError = getGrossSalaryError(grossAnnualSalary);
   const socialSecurity = calculateEmployeeSocialSecurity(
     grossAnnualSalary ?? 0,
@@ -63,18 +89,18 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)] lg:items-start">
           <div>
             <span className="inline-flex rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium tracking-[0.18em] text-accent uppercase">
-              CSN-010
+              CSN-011
             </span>
             <div className="mt-8 max-w-3xl space-y-6">
               <h1 className="text-4xl font-semibold tracking-tight text-primary-strong sm:text-6xl">
                 Calculadora de sueldo neto con base fiscal 2025.
               </h1>
               <p className="max-w-2xl text-base leading-8 text-muted sm:text-lg">
-                El formulario base ya permite fijar salario bruto anual, tipo de
-                contrato y numero de pagas para anticipar el impacto mensual.
+                El formulario base ya recoge salario, contrato, pagas y territorio
+                para contextualizar la estimacion fiscal desde la primera pantalla.
               </p>
             </div>
-            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            <div className="mt-10 grid gap-4 sm:grid-cols-4">
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Entrada</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
@@ -94,9 +120,15 @@ export default function Home() {
                 </p>
               </article>
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
+                <p className="text-sm font-medium text-muted">Territorio</p>
+                <p className="mt-2 text-lg font-semibold text-primary">
+                  {autonomousCommunityLabels[autonomousCommunity]}
+                </p>
+              </article>
+              <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Estado</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
-                  Listo para CSN-011
+                  Listo para CSN-012
                 </p>
               </article>
             </div>
@@ -213,6 +245,33 @@ export default function Home() {
                   <p className="text-sm text-muted">Tipo aplicado: {unemploymentRate.toFixed(2)}%</p>
                 </article>
               </div>
+            </div>
+
+            <div className="mt-8 space-y-3">
+              <label
+                htmlFor="autonomous-community"
+                className="block text-sm font-medium text-primary-strong"
+              >
+                Comunidad autonoma
+              </label>
+              <select
+                id="autonomous-community"
+                value={autonomousCommunity}
+                onChange={(event) => {
+                  setAutonomousCommunity(event.target.value as AutonomousCommunity);
+                }}
+                className="w-full rounded-[var(--radius-card)] border bg-surface px-4 py-3 text-base font-medium text-primary shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+              >
+                {AUTONOMOUS_COMMUNITIES.map((community) => (
+                  <option key={community} value={community}>
+                    {autonomousCommunityLabels[community]}
+                  </option>
+                ))}
+              </select>
+              <p className="rounded-[var(--radius-card)] border border-border bg-surface px-4 py-3 text-sm leading-6 text-muted">
+                El IRPF autonomico puede variar segun la comunidad. Por ahora, la
+                calculadora usa la referencia estatal como estimacion orientativa.
+              </p>
             </div>
           </aside>
         </div>
