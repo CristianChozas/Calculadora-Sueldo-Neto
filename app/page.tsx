@@ -66,9 +66,13 @@ const disabilityLabels: Record<DisabilityLevel, string> = {
   "65_plus": "Discapacidad 65%+",
 };
 
-function getGrossSalaryError(value: number | null) {
+function getGrossSalaryError(rawValue: string, value: number | null) {
+  if (!rawValue.trim()) {
+    return "El salario bruto anual es obligatorio.";
+  }
+
   if (value === null) {
-    return undefined;
+    return "Introduce una cantidad valida en EUR.";
   }
 
   if (value < MIN_SALARY) {
@@ -82,22 +86,40 @@ function getGrossSalaryError(value: number | null) {
   return undefined;
 }
 
+function getDependantsError(rawValue: string) {
+  if (!rawValue.trim()) {
+    return "El numero de descendientes es obligatorio.";
+  }
+
+  if (!/^\d+$/.test(rawValue.trim())) {
+    return "Introduce un numero entero igual o superior a 0.";
+  }
+
+  return undefined;
+}
+
 export default function Home() {
   const [grossAnnualSalary, setGrossAnnualSalary] = useState<number | null>(null);
+  const [grossAnnualSalaryRaw, setGrossAnnualSalaryRaw] = useState("");
   const [contractType, setContractType] = useState<ContractType>("indefinido");
   const [paymentsPerYear, setPaymentsPerYear] = useState<PayPeriods>(12);
   const [autonomousCommunity, setAutonomousCommunity] =
     useState<AutonomousCommunity>("madrid");
   const [maritalStatus, setMaritalStatus] = useState<MaritalStatus>("soltero");
-  const [dependants, setDependants] = useState(0);
+  const [dependantsRaw, setDependantsRaw] = useState("0");
   const [disability, setDisability] = useState<DisabilityLevel>("none");
-  const grossAnnualSalaryError = getGrossSalaryError(grossAnnualSalary);
+  const grossAnnualSalaryError = getGrossSalaryError(grossAnnualSalaryRaw, grossAnnualSalary);
+  const dependantsError = getDependantsError(dependantsRaw);
+  const dependants = dependantsError ? 0 : Number(dependantsRaw);
   const socialSecurity = calculateEmployeeSocialSecurity(
-    grossAnnualSalary ?? 0,
+    grossAnnualSalaryError ? 0 : grossAnnualSalary ?? 0,
     contractType,
     paymentsPerYear,
   );
-  const grossMonthlySalary = grossAnnualSalary === null ? null : grossAnnualSalary / paymentsPerYear;
+  const grossMonthlySalary =
+    grossAnnualSalaryError || grossAnnualSalary === null
+      ? null
+      : grossAnnualSalary / paymentsPerYear;
   const unemploymentRate =
     SOCIAL_SECURITY_RATES_2025.unemploymentByContract[contractType] * 100;
 
@@ -107,15 +129,15 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)] lg:items-start">
           <div>
             <span className="inline-flex rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium tracking-[0.18em] text-accent uppercase">
-              CSN-012
+              CSN-013
             </span>
             <div className="mt-8 max-w-3xl space-y-6">
               <h1 className="text-4xl font-semibold tracking-tight text-primary-strong sm:text-6xl">
                 Calculadora de sueldo neto con base fiscal 2025.
               </h1>
               <p className="max-w-2xl text-base leading-8 text-muted sm:text-lg">
-                El formulario base ya recoge tambien la situacion personal y familiar
-                para preparar el siguiente salto hacia el calculo reactivo completo.
+                La capa de entrada ya valida campos obligatorios, rango y formato
+                numerico para preparar el calculo en tiempo real del siguiente ticket.
               </p>
             </div>
             <div className="mt-10 grid gap-4 sm:grid-cols-5">
@@ -152,7 +174,7 @@ export default function Home() {
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Estado</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
-                  Listo para CSN-013
+                  Listo para CSN-014
                 </p>
               </article>
             </div>
@@ -167,6 +189,7 @@ export default function Home() {
                 label="Salario bruto anual"
                 value={grossAnnualSalary}
                 onValueChange={setGrossAnnualSalary}
+                onRawValueChange={setGrossAnnualSalaryRaw}
                 min={MIN_SALARY}
                 max={MAX_SALARY}
                 error={grossAnnualSalaryError}
@@ -342,16 +365,25 @@ export default function Home() {
               </label>
               <input
                 id="dependants"
-                type="number"
-                min={0}
-                step={1}
-                value={dependants}
+                type="text"
+                inputMode="numeric"
+                value={dependantsRaw}
+                aria-invalid={Boolean(dependantsError)}
+                aria-describedby={dependantsError ? "dependants-error" : undefined}
                 onChange={(event) => {
-                  const parsedValue = Number(event.target.value);
-                  setDependants(Number.isFinite(parsedValue) ? Math.max(0, Math.trunc(parsedValue)) : 0);
+                  setDependantsRaw(event.target.value);
                 }}
                 className="w-full rounded-[var(--radius-card)] border bg-surface px-4 py-3 text-base font-medium text-primary shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
               />
+              {dependantsError ? (
+                <p id="dependants-error" className="text-sm font-medium text-danger">
+                  {dependantsError}
+                </p>
+              ) : (
+                <p className="text-sm leading-6 text-muted">
+                  Introduce el numero de hijos o descendientes a cargo con un entero desde 0.
+                </p>
+              )}
             </div>
 
             <div className="mt-8 space-y-3">

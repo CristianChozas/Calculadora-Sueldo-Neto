@@ -13,6 +13,7 @@ type CurrencyInputProps = {
   label: string;
   value: number | null;
   onValueChange: (value: number | null) => void;
+  onRawValueChange?: (rawValue: string) => void;
   min?: number;
   max?: number;
   error?: string;
@@ -45,6 +46,7 @@ export function CurrencyInput({
   label,
   value,
   onValueChange,
+  onRawValueChange,
   min,
   max,
   error,
@@ -60,7 +62,7 @@ export function CurrencyInput({
   const displayValue = isFocused
     ? draftValue
     : value === null
-      ? ""
+      ? draftValue
       : currencyFormatter.format(value);
 
   return (
@@ -81,17 +83,21 @@ export function CurrencyInput({
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${hint ? `${hintId} ` : ""}${errorId}` : hint ? hintId : undefined}
           onFocus={() => {
-            setDraftValue(value === null ? "" : formatEditableValue(value));
+            setDraftValue(value === null ? draftValue : formatEditableValue(value));
             setIsFocused(true);
           }}
           onBlur={() => {
             setIsFocused(false);
-            setDraftValue("");
+
+            if (value !== null) {
+              setDraftValue("");
+            }
           }}
           onChange={(event) => {
             const nextDisplayValue = event.target.value;
 
             setDraftValue(nextDisplayValue);
+            onRawValueChange?.(nextDisplayValue);
             onValueChange(parseCurrencyInput(nextDisplayValue));
           }}
           min={min}
