@@ -4,6 +4,7 @@ import { useState } from "react";
 import { BreakdownRow } from "@/components/BreakdownRow";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { ResultCard } from "@/components/ResultCard";
+import { SalaryDistributionChart } from "@/components/SalaryDistributionChart";
 import {
   AUTONOMOUS_COMMUNITIES,
   CONTRACT_TYPES,
@@ -164,6 +165,25 @@ export default function Home() {
   const highlightedMonthlyNetSalary = calculationResult
     ? currencyFormatter.format(calculationResult.netMonthlySalary)
     : "Pendiente";
+  const salaryDistribution = calculationResult
+    ? [
+        {
+          label: "Neto",
+          value: calculationResult.netAnnualSalary,
+          color: "var(--accent)",
+        },
+        {
+          label: "IRPF",
+          value: calculationResult.irpf.totalTaxQuota,
+          color: "var(--danger)",
+        },
+        {
+          label: "Seguridad Social",
+          value: calculationResult.socialSecurity.totalEmployeeContributions,
+          color: "var(--primary)",
+        },
+      ]
+    : [];
 
   return (
     <main className="flex min-h-screen items-center justify-center px-6 py-18">
@@ -171,15 +191,15 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)] lg:items-start">
           <div>
             <span className="inline-flex rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium tracking-[0.18em] text-accent uppercase">
-              CSN-016
+              CSN-017
             </span>
             <div className="mt-8 max-w-3xl space-y-6">
               <h1 className="text-4xl font-semibold tracking-tight text-primary-strong sm:text-6xl">
                 Calculadora de sueldo neto con base fiscal 2025.
               </h1>
               <p className="max-w-2xl text-base leading-8 text-muted sm:text-lg">
-                El panel de resultados ya incorpora el desglose de bruto, IRPF,
-                Seguridad Social y neto con importes y porcentajes.
+                El panel de resultados ya visualiza la distribucion entre neto,
+                IRPF y Seguridad Social con un grafico integrado.
               </p>
             </div>
             <div className="mt-10">
@@ -229,7 +249,7 @@ export default function Home() {
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Estado</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
-                  Listo para CSN-017
+                  Listo para CSN-018
                 </p>
               </article>
             </div>
@@ -426,6 +446,14 @@ export default function Home() {
                   </div>
                 </div>
               )}
+            </div>
+
+            <div className="mt-8">
+              <SalaryDistributionChart
+                items={salaryDistribution}
+                total={calculationResult?.grossAnnualSalary ?? 0}
+                pending={!calculationResult}
+              />
             </div>
 
             <div className="mt-8 space-y-3">
