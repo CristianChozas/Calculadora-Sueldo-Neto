@@ -93,7 +93,9 @@ export function SalaryDistributionChart({
                 x="50%"
                 y="48%"
                 textAnchor="middle"
-                className="fill-primary-strong text-[12px] font-medium"
+                fill="var(--primary-strong)"
+                fontSize="12"
+                fontWeight="500"
               >
                 Bruto anual
               </text>
@@ -101,7 +103,9 @@ export function SalaryDistributionChart({
                 x="50%"
                 y="58%"
                 textAnchor="middle"
-                className="fill-primary-strong text-[18px] font-semibold"
+                fill="var(--primary-strong)"
+                fontSize="18"
+                fontWeight="600"
               >
                 100%
               </text>

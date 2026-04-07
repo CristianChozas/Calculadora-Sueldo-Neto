@@ -188,7 +188,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b border-border bg-surface/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-6 py-5 sm:px-8 lg:px-10">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-5 min-[375px]:px-6 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
           <div>
             <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
               Calculadora sueldo neto
@@ -203,7 +203,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="mx-auto w-full max-w-7xl px-6 py-8 sm:px-8 lg:px-10 lg:py-10">
+      <section className="mx-auto w-full max-w-7xl px-4 py-6 min-[375px]:px-6 min-[375px]:py-8 sm:px-8 md:py-10 lg:px-10">
         <div className="rounded-[var(--radius-card)] border border-border bg-surface px-6 py-8 shadow-[var(--shadow-soft)] sm:px-8 sm:py-10 lg:px-10 lg:py-12">
           <div className="max-w-3xl space-y-6">
             <h2 className="text-4xl font-semibold tracking-tight text-primary-strong sm:text-5xl">
@@ -249,9 +249,15 @@ export default function Home() {
             </article>
           </div>
 
-          <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
-            <section className="rounded-[var(--radius-card)] border border-border bg-surface-muted p-6 sm:p-8">
-              <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
+          <div className="mt-12 grid gap-8 md:gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
+            <section
+              aria-labelledby="input-panel-title"
+              className="rounded-[var(--radius-card)] border border-border bg-surface-muted p-5 min-[375px]:p-6 sm:p-8"
+            >
+              <p
+                id="input-panel-title"
+                className="text-sm font-medium tracking-[0.18em] text-accent uppercase"
+              >
                 Datos de entrada
               </p>
               <div className="mt-6">
@@ -266,8 +272,10 @@ export default function Home() {
                   hint="Introduce el salario anual antes de retenciones y cotizaciones."
                 />
               </div>
-              <div className="mt-8 space-y-3">
-                <p className="text-sm font-medium text-primary-strong">Tipo de contrato</p>
+              <fieldset className="mt-8 space-y-3">
+                <legend className="text-sm font-medium text-primary-strong">
+                  Tipo de contrato
+                </legend>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {CONTRACT_TYPES.map((option) => {
                     const isSelected = option === contractType;
@@ -302,9 +310,9 @@ export default function Home() {
                     );
                   })}
                 </div>
-              </div>
+              </fieldset>
 
-              <div className="mt-8 space-y-3">
+              <fieldset className="mt-8 space-y-3">
                 <label
                   htmlFor="payments-per-year"
                   className="block text-sm font-medium text-primary-strong"
@@ -339,7 +347,7 @@ export default function Home() {
                     );
                   })}
                 </div>
-              </div>
+              </fieldset>
 
               <div className="mt-8 space-y-3">
                 <label
@@ -395,8 +403,8 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="mt-8 space-y-3">
-                <p className="text-sm font-medium text-primary-strong">Estado civil</p>
+              <fieldset className="mt-8 space-y-3">
+                <legend className="text-sm font-medium text-primary-strong">Estado civil</legend>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {MARITAL_STATUSES.map((option) => {
                     const isSelected = option === maritalStatus;
@@ -428,7 +436,7 @@ export default function Home() {
                     );
                   })}
                 </div>
-              </div>
+              </fieldset>
 
               <div className="mt-8 space-y-3">
                 <label
@@ -516,15 +524,18 @@ export default function Home() {
               </div>
             </section>
 
-            <aside className="space-y-8">
+            <aside aria-labelledby="results-panel-title" className="space-y-8">
               <ResultCard
                 annualNetSalary={highlightedAnnualNetSalary}
                 monthlyNetSalary={highlightedMonthlyNetSalary}
                 isPending={!calculationResult}
               />
 
-              <div className="rounded-[var(--radius-card)] border border-border bg-surface-muted p-6 sm:p-8">
-                <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
+              <div className="rounded-[var(--radius-card)] border border-border bg-surface-muted p-5 min-[375px]:p-6 sm:p-8">
+                <p
+                  id="results-panel-title"
+                  className="text-sm font-medium tracking-[0.18em] text-accent uppercase"
+                >
                   Panel de resultados
                 </p>
 
@@ -667,7 +678,7 @@ export default function Home() {
       </section>
 
       <footer className="border-t border-border bg-surface">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-5 text-sm text-muted sm:px-8 lg:px-10">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-5 text-sm text-muted min-[375px]:px-6 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
           <p>Calculadora Sueldo Neto 2025</p>
           <p>Cristian Chozas Diaz - 2025</p>
         </div>

@@ -10,7 +10,10 @@ export function ResultCard({
   isPending = false,
 }: ResultCardProps) {
   return (
-    <article className="overflow-hidden rounded-[var(--radius-card)] bg-primary-strong text-white shadow-[var(--shadow-soft)]">
+    <article
+      aria-live="polite"
+      className="overflow-hidden rounded-[var(--radius-card)] bg-primary-strong text-white shadow-[var(--shadow-soft)]"
+    >
       <div className="bg-linear-to-br from-accent/35 via-transparent to-transparent px-6 py-6 sm:px-8 sm:py-8">
         <p className="text-sm font-medium tracking-[0.18em] text-white/72 uppercase">
           Sueldo neto estimado
