@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BreakdownRow } from "@/components/BreakdownRow";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { ResultCard } from "@/components/ResultCard";
 import {
@@ -112,6 +113,10 @@ function getAgeError(rawValue: string) {
   return undefined;
 }
 
+function formatPercentage(value: number) {
+  return `${value.toFixed(2)}%`;
+}
+
 export default function Home() {
   const [grossAnnualSalary, setGrossAnnualSalary] = useState<number | null>(null);
   const [grossAnnualSalaryRaw, setGrossAnnualSalaryRaw] = useState("");
@@ -166,15 +171,15 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)] lg:items-start">
           <div>
             <span className="inline-flex rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium tracking-[0.18em] text-accent uppercase">
-              CSN-015
+              CSN-016
             </span>
             <div className="mt-8 max-w-3xl space-y-6">
               <h1 className="text-4xl font-semibold tracking-tight text-primary-strong sm:text-6xl">
                 Calculadora de sueldo neto con base fiscal 2025.
               </h1>
               <p className="max-w-2xl text-base leading-8 text-muted sm:text-lg">
-                El neto anual y mensual ya se presenta como el dato principal de la
-                pantalla para que la lectura sea inmediata.
+                El panel de resultados ya incorpora el desglose de bruto, IRPF,
+                Seguridad Social y neto con importes y porcentajes.
               </p>
             </div>
             <div className="mt-10">
@@ -224,7 +229,7 @@ export default function Home() {
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Estado</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
-                  Listo para CSN-016
+                  Listo para CSN-017
                 </p>
               </article>
             </div>
@@ -323,43 +328,84 @@ export default function Home() {
 
             <div className="mt-8 rounded-[var(--radius-card)] border border-border bg-surface p-5">
               <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
-                Resultado en tiempo real
+                Desglose de deducciones
               </p>
               {calculationResult ? (
                 <div className="mt-4 space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <article>
-                      <p className="text-sm font-medium text-muted">IRPF estimado</p>
-                      <p className="mt-1 text-lg font-semibold text-primary-strong">
-                        {currencyFormatter.format(calculationResult.irpf.totalTaxQuota)}
-                      </p>
-                      <p className="text-sm text-muted">
-                        Tipo efectivo: {calculationResult.irpf.effectiveRate.toFixed(2)}%
-                      </p>
-                    </article>
-                    <article>
-                      <p className="text-sm font-medium text-muted">Seguridad Social</p>
-                      <p className="mt-1 text-lg font-semibold text-primary-strong">
-                        {currencyFormatter.format(
-                          calculationResult.socialSecurity.totalEmployeeContributions,
-                        )}
-                      </p>
-                      <p className="text-sm text-muted">
-                        Desempleo incluido: {currencyFormatter.format(
-                          calculationResult.socialSecurity.unemployment,
-                        )}
-                      </p>
-                    </article>
-                  </div>
+                  <BreakdownRow
+                    label="Bruto anual"
+                    amount={currencyFormatter.format(calculationResult.grossAnnualSalary)}
+                    percentage={formatPercentage(100)}
+                  />
+                  <BreakdownRow
+                    label="IRPF"
+                    amount={currencyFormatter.format(calculationResult.irpf.totalTaxQuota)}
+                    percentage={formatPercentage(calculationResult.irpf.effectiveRate)}
+                    tone="danger"
+                  />
+                  <BreakdownRow
+                    label="Contingencias comunes"
+                    amount={currencyFormatter.format(
+                      calculationResult.socialSecurity.commonContingencies,
+                    )}
+                    percentage={formatPercentage(
+                      (calculationResult.socialSecurity.commonContingencies /
+                        calculationResult.grossAnnualSalary) *
+                        100,
+                    )}
+                  />
+                  <BreakdownRow
+                    label="Desempleo"
+                    amount={currencyFormatter.format(calculationResult.socialSecurity.unemployment)}
+                    percentage={formatPercentage(
+                      (calculationResult.socialSecurity.unemployment /
+                        calculationResult.grossAnnualSalary) *
+                        100,
+                    )}
+                  />
+                  <BreakdownRow
+                    label="Formacion profesional"
+                    amount={currencyFormatter.format(calculationResult.socialSecurity.training)}
+                    percentage={formatPercentage(
+                      (calculationResult.socialSecurity.training /
+                        calculationResult.grossAnnualSalary) *
+                        100,
+                    )}
+                  />
+                  <BreakdownRow
+                    label="MEI"
+                    amount={currencyFormatter.format(calculationResult.socialSecurity.mei)}
+                    percentage={formatPercentage(
+                      (calculationResult.socialSecurity.mei /
+                        calculationResult.grossAnnualSalary) *
+                        100,
+                    )}
+                  />
+                  <BreakdownRow
+                    label="Seguridad Social total"
+                    amount={currencyFormatter.format(
+                      calculationResult.socialSecurity.totalEmployeeContributions,
+                    )}
+                    percentage={formatPercentage(calculationResult.socialSecurity.effectiveRate)}
+                    tone="danger"
+                  />
+                  <BreakdownRow
+                    label="Neto anual"
+                    amount={currencyFormatter.format(calculationResult.netAnnualSalary)}
+                    percentage={formatPercentage(
+                      (calculationResult.netAnnualSalary / calculationResult.grossAnnualSalary) * 100,
+                    )}
+                    tone="accent"
+                  />
                   <p className="text-sm leading-6 text-muted">
-                    Base mensual bruta: {currencyFormatter.format(calculationResult.grossMonthlySalary)}. Tipo de paro aplicado: {unemploymentRate.toFixed(2)}%.
+                    Base mensual bruta: {currencyFormatter.format(calculationResult.grossMonthlySalary)}. Neto mensual: {currencyFormatter.format(calculationResult.netMonthlySalary)}. Tipo de paro aplicado: {unemploymentRate.toFixed(2)}%.
                   </p>
                 </div>
               ) : (
                 <div className="mt-4 space-y-3">
                   <p className="text-sm leading-6 text-muted">
                     Completa los campos obligatorios con valores validos para ver la
-                    estimacion reactiva del sueldo neto.
+                    estimacion reactiva del sueldo neto y su desglose detallado.
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <article>
