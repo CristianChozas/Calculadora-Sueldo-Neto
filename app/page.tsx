@@ -5,9 +5,13 @@ import { CurrencyInput } from "@/components/CurrencyInput";
 import {
   AUTONOMOUS_COMMUNITIES,
   CONTRACT_TYPES,
+  DISABILITY_LEVELS,
+  MARITAL_STATUSES,
   PAY_PERIOD_OPTIONS,
   type AutonomousCommunity,
   type ContractType,
+  type DisabilityLevel,
+  type MaritalStatus,
   type PayPeriods,
 } from "@/lib/types";
 import {
@@ -51,6 +55,17 @@ const autonomousCommunityLabels: Record<AutonomousCommunity, string> = {
   pais_vasco: "Pais Vasco",
 };
 
+const maritalStatusLabels: Record<MaritalStatus, string> = {
+  soltero: "Soltero",
+  casado: "Casado",
+};
+
+const disabilityLabels: Record<DisabilityLevel, string> = {
+  none: "Sin discapacidad",
+  "33_plus": "Discapacidad 33%+",
+  "65_plus": "Discapacidad 65%+",
+};
+
 function getGrossSalaryError(value: number | null) {
   if (value === null) {
     return undefined;
@@ -73,6 +88,9 @@ export default function Home() {
   const [paymentsPerYear, setPaymentsPerYear] = useState<PayPeriods>(12);
   const [autonomousCommunity, setAutonomousCommunity] =
     useState<AutonomousCommunity>("madrid");
+  const [maritalStatus, setMaritalStatus] = useState<MaritalStatus>("soltero");
+  const [dependants, setDependants] = useState(0);
+  const [disability, setDisability] = useState<DisabilityLevel>("none");
   const grossAnnualSalaryError = getGrossSalaryError(grossAnnualSalary);
   const socialSecurity = calculateEmployeeSocialSecurity(
     grossAnnualSalary ?? 0,
@@ -89,18 +107,18 @@ export default function Home() {
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(22rem,0.8fr)] lg:items-start">
           <div>
             <span className="inline-flex rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium tracking-[0.18em] text-accent uppercase">
-              CSN-011
+              CSN-012
             </span>
             <div className="mt-8 max-w-3xl space-y-6">
               <h1 className="text-4xl font-semibold tracking-tight text-primary-strong sm:text-6xl">
                 Calculadora de sueldo neto con base fiscal 2025.
               </h1>
               <p className="max-w-2xl text-base leading-8 text-muted sm:text-lg">
-                El formulario base ya recoge salario, contrato, pagas y territorio
-                para contextualizar la estimacion fiscal desde la primera pantalla.
+                El formulario base ya recoge tambien la situacion personal y familiar
+                para preparar el siguiente salto hacia el calculo reactivo completo.
               </p>
             </div>
-            <div className="mt-10 grid gap-4 sm:grid-cols-4">
+            <div className="mt-10 grid gap-4 sm:grid-cols-5">
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Entrada</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
@@ -126,9 +144,15 @@ export default function Home() {
                 </p>
               </article>
               <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
+                <p className="text-sm font-medium text-muted">Situacion</p>
+                <p className="mt-2 text-lg font-semibold text-primary">
+                  {maritalStatusLabels[maritalStatus]}
+                </p>
+              </article>
+              <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
                 <p className="text-sm font-medium text-muted">Estado</p>
                 <p className="mt-2 text-lg font-semibold text-primary">
-                  Listo para CSN-012
+                  Listo para CSN-013
                 </p>
               </article>
             </div>
@@ -272,6 +296,111 @@ export default function Home() {
                 El IRPF autonomico puede variar segun la comunidad. Por ahora, la
                 calculadora usa la referencia estatal como estimacion orientativa.
               </p>
+            </div>
+
+            <div className="mt-8 space-y-3">
+              <p className="text-sm font-medium text-primary-strong">Estado civil</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {MARITAL_STATUSES.map((option) => {
+                  const isSelected = option === maritalStatus;
+
+                  return (
+                    <label
+                      key={option}
+                      className={`cursor-pointer rounded-[var(--radius-card)] border px-4 py-4 transition ${
+                        isSelected
+                          ? "border-accent bg-accent-soft text-primary-strong"
+                          : "border-border bg-surface text-primary"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="maritalStatus"
+                        value={option}
+                        checked={isSelected}
+                        onChange={() => setMaritalStatus(option)}
+                        className="sr-only"
+                      />
+                      <span className="block text-sm font-medium text-muted">
+                        Situacion personal
+                      </span>
+                      <span className="mt-1 block text-lg font-semibold">
+                        {maritalStatusLabels[option]}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-8 space-y-3">
+              <label
+                htmlFor="dependants"
+                className="block text-sm font-medium text-primary-strong"
+              >
+                Numero de hijos o descendientes a cargo
+              </label>
+              <input
+                id="dependants"
+                type="number"
+                min={0}
+                step={1}
+                value={dependants}
+                onChange={(event) => {
+                  const parsedValue = Number(event.target.value);
+                  setDependants(Number.isFinite(parsedValue) ? Math.max(0, Math.trunc(parsedValue)) : 0);
+                }}
+                className="w-full rounded-[var(--radius-card)] border bg-surface px-4 py-3 text-base font-medium text-primary shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+              />
+            </div>
+
+            <div className="mt-8 space-y-3">
+              <label
+                htmlFor="disability"
+                className="block text-sm font-medium text-primary-strong"
+              >
+                Discapacidad
+              </label>
+              <select
+                id="disability"
+                value={disability}
+                onChange={(event) => {
+                  setDisability(event.target.value as DisabilityLevel);
+                }}
+                className="w-full rounded-[var(--radius-card)] border bg-surface px-4 py-3 text-base font-medium text-primary shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20"
+              >
+                {DISABILITY_LEVELS.map((option) => (
+                  <option key={option} value={option}>
+                    {disabilityLabels[option]}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mt-8 rounded-[var(--radius-card)] border border-border bg-surface p-5">
+              <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
+                Situacion familiar actual
+              </p>
+              <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                <article>
+                  <p className="text-sm font-medium text-muted">Estado civil</p>
+                  <p className="mt-1 text-lg font-semibold text-primary-strong">
+                    {maritalStatusLabels[maritalStatus]}
+                  </p>
+                </article>
+                <article>
+                  <p className="text-sm font-medium text-muted">Descendientes</p>
+                  <p className="mt-1 text-lg font-semibold text-primary-strong">
+                    {dependants}
+                  </p>
+                </article>
+                <article>
+                  <p className="text-sm font-medium text-muted">Discapacidad</p>
+                  <p className="mt-1 text-lg font-semibold text-primary-strong">
+                    {disabilityLabels[disability]}
+                  </p>
+                </article>
+              </div>
             </div>
           </aside>
         </div>
