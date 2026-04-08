@@ -10,7 +10,7 @@ export function getSiteUrl() {
     return DEVELOPMENT_SITE_URL;
   }
 
-  if (process.env.VERCEL_URL) {
+  if (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
 
