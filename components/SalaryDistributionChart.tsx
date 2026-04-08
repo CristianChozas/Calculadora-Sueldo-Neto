@@ -39,7 +39,7 @@ export function SalaryDistributionChart({
   });
 
   return (
-    <article className="rounded-[var(--radius-card)] border border-border bg-surface p-5">
+    <article className="rounded-[var(--radius-card)] border border-border bg-white p-5">
       <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
         Distribucion salarial
       </p>

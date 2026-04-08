@@ -14,5 +14,5 @@ Reducir la base imponible mediante una funcion pura que modele el minimo persona
 ## Fuera de alcance
 
 - Ascendientes a cargo.
-- Hijos menores de tres anos.
+- Hijos menores de tres años.
 - Tributacion conjunta u otros ajustes autonomicos.

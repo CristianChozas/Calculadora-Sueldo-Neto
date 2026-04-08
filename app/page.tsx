@@ -4,7 +4,6 @@ import { useState } from "react";
 import { BreakdownRow } from "@/components/BreakdownRow";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { ResultCard } from "@/components/ResultCard";
-import { SalaryDistributionChart } from "@/components/SalaryDistributionChart";
 import {
   AUTONOMOUS_COMMUNITIES,
   CONTRACT_TYPES,
@@ -108,7 +107,7 @@ function getAgeError(rawValue: string) {
   }
 
   if (!/^\d+$/.test(rawValue.trim())) {
-    return "Introduce una edad valida en anos cumplidos.";
+    return "Introduce una edad valida en años cumplidos.";
   }
 
   return undefined;
@@ -165,41 +164,19 @@ export default function Home() {
   const highlightedMonthlyNetSalary = calculationResult
     ? currencyFormatter.format(calculationResult.netMonthlySalary)
     : "Pendiente";
-  const salaryDistribution = calculationResult
-    ? [
-        {
-          label: "Neto",
-          value: calculationResult.netAnnualSalary,
-          color: "var(--accent)",
-        },
-        {
-          label: "IRPF",
-          value: calculationResult.irpf.totalTaxQuota,
-          color: "var(--danger)",
-        },
-        {
-          label: "Seguridad Social",
-          value: calculationResult.socialSecurity.totalEmployeeContributions,
-          color: "var(--primary)",
-        },
-      ]
-    : [];
 
   return (
     <main className="min-h-screen bg-background">
-      <header className="border-b border-border bg-surface/90 backdrop-blur">
+      <header className="border-b border-border bg-white">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-5 min-[375px]:px-6 sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
           <div>
-            <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
-              Calculadora sueldo neto
+            <p className="text-sm font-medium tracking-[0.18em] text-muted uppercase">
+              Simulador salarial
             </p>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight text-primary-strong sm:text-3xl">
-              Estimador fiscal 2025 para Espana
+              Calculadora de sueldo neto
             </h1>
           </div>
-          <span className="inline-flex rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium tracking-[0.18em] text-accent uppercase">
-            CSN-019
-          </span>
         </div>
       </header>
 
@@ -210,13 +187,12 @@ export default function Home() {
               Calculadora de sueldo neto con base fiscal 2025.
             </h2>
             <p className="max-w-2xl text-base leading-8 text-muted sm:text-lg">
-              La aplicacion ya organiza el formulario y los resultados en un layout claro:
-              formulario a la izquierda y panel fiscal a la derecha en desktop, con stack
-              vertical en movil.
+              Calcula tu sueldo neto anual y mensual con una presentacion clara,
+              formal y orientada a consulta profesional.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
               <p className="text-sm font-medium text-muted">Entrada</p>
               <p className="mt-2 text-lg font-semibold text-primary">Salario bruto anual</p>
@@ -229,7 +205,7 @@ export default function Home() {
             </article>
             <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
               <p className="text-sm font-medium text-muted">Pagas</p>
-              <p className="mt-2 text-lg font-semibold text-primary">{paymentsPerYear} al ano</p>
+              <p className="mt-2 text-lg font-semibold text-primary">{paymentsPerYear} al año</p>
             </article>
             <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
               <p className="text-sm font-medium text-muted">Territorio</p>
@@ -242,10 +218,6 @@ export default function Home() {
               <p className="mt-2 text-lg font-semibold text-primary">
                 {maritalStatusLabels[maritalStatus]}
               </p>
-            </article>
-            <article className="rounded-[var(--radius-card)] bg-surface-muted p-5">
-              <p className="text-sm font-medium text-muted">Estado</p>
-              <p className="mt-2 text-lg font-semibold text-primary">Listo para CSN-020</p>
             </article>
           </div>
 
@@ -285,7 +257,7 @@ export default function Home() {
                         key={option}
                         className={`cursor-pointer rounded-[var(--radius-card)] border px-4 py-4 transition ${
                           isSelected
-                            ? "border-accent bg-accent-soft text-primary-strong"
+                            ? "border-primary bg-white text-primary-strong"
                             : "border-border bg-surface text-primary"
                         }`}
                       >
@@ -328,7 +300,7 @@ export default function Home() {
                         key={option}
                         className={`cursor-pointer rounded-[var(--radius-card)] border px-4 py-4 transition ${
                           isSelected
-                            ? "border-accent bg-accent-soft text-primary-strong"
+                            ? "border-primary bg-white text-primary-strong"
                             : "border-border bg-surface text-primary"
                         }`}
                       >
@@ -414,7 +386,7 @@ export default function Home() {
                         key={option}
                         className={`cursor-pointer rounded-[var(--radius-card)] border px-4 py-4 transition ${
                           isSelected
-                            ? "border-accent bg-accent-soft text-primary-strong"
+                            ? "border-primary bg-white text-primary-strong"
                             : "border-border bg-surface text-primary"
                         }`}
                       >
@@ -505,7 +477,7 @@ export default function Home() {
                   <article>
                     <p className="text-sm font-medium text-muted">Edad</p>
                     <p className="mt-1 text-lg font-semibold text-primary-strong">
-                      {ageError ? "Pendiente" : `${age} anos`}
+                      {ageError ? "Pendiente" : `${age} años`}
                     </p>
                   </article>
                   <article>
@@ -531,7 +503,7 @@ export default function Home() {
                 isPending={!calculationResult}
               />
 
-              <div className="rounded-[var(--radius-card)] border border-border bg-surface-muted p-5 min-[375px]:p-6 sm:p-8">
+              <div className="border border-border bg-surface-muted p-5 min-[375px]:p-6 sm:p-8">
                 <p
                   id="results-panel-title"
                   className="text-sm font-medium tracking-[0.18em] text-accent uppercase"
@@ -539,7 +511,7 @@ export default function Home() {
                   Panel de resultados
                 </p>
 
-                <div className="mt-6 rounded-[var(--radius-card)] border border-border bg-surface p-5">
+                <div className="mt-6 border border-border bg-white p-5">
                   <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
                     Desglose de deducciones
                   </p>
@@ -645,15 +617,7 @@ export default function Home() {
                   )}
                 </div>
 
-                <div className="mt-8">
-                  <SalaryDistributionChart
-                    items={salaryDistribution}
-                    total={calculationResult?.grossAnnualSalary ?? 0}
-                    pending={!calculationResult}
-                  />
-                </div>
-
-                <div className="mt-8 rounded-[var(--radius-card)] border border-border bg-surface p-5">
+                <div className="mt-8 border border-border bg-white p-5">
                   <p className="text-sm font-medium tracking-[0.18em] text-accent uppercase">
                     Transparencia fiscal
                   </p>
@@ -662,7 +626,7 @@ export default function Home() {
                       href="https://sede.agenciatributaria.gob.es"
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center rounded-[var(--radius-pill)] bg-accent-soft px-4 py-2 text-sm font-medium text-accent transition hover:bg-accent/18"
+                      className="inline-flex items-center border border-border bg-surface-muted px-4 py-2 text-sm font-medium text-primary-strong transition hover:bg-white"
                     >
                       Como se calcula el IRPF?
                     </a>
